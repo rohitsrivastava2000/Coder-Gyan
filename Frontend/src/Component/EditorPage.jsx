@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Editor from '@monaco-editor/react';
 
-function EditorPage({ socketRef, meetingID ,onCodeChange }) {
+import Editor from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
+import './nameStyle.css'
+
+function EditorPage({ socketRef, meetingID ,onCodeChange,language }) {
   const [code, setCode] = useState(`// Welcome To Coder'$ Gyan`);
   const editorRef = useRef(null);
   const isRemoteUpdate = useRef(false);
-
-
+  
+ // const userCursorsRef = useRef({}); 
+  console.log(language +" language yeh aaraha hai hai ")
   const editorOptions = {
     fontSize: 18,
     wordWrap: 'on',
@@ -29,7 +33,43 @@ function EditorPage({ socketRef, meetingID ,onCodeChange }) {
       onCodeChange(updatedCode);
       socketRef.current.emit('code-change', { code: updatedCode, meetingID });
     });
+
+    // Inside EditorPage, after editorRef is available
+    // editor.onDidChangeCursorSelection((e) => {
+    //   const position = e.selection.getPosition();
+    //   socketRef.current.emit('cursor-position', {
+    //    // socketID:socketRef.current.id,
+    //     position,
+    //     meetingID,
+    //   });
+    // });
+    //  // ✅ Handle incoming remote cursor positions
+    //  socketRef.current.on('cursor-position', ({ username, socketID, position }) => {
+
+    //    if (socketID === socketRef.current.id) return; // Don't show for self
+    //    console.log(username +" ha yeh username hai ")
+
+    //   const range = new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column);
+    //   const decoration = {
+    //     range,
+    //     options: {
+    //       className: 'border-l-2 border-yellow-400',
+    //       after: {
+    //         content: `👤 ${username}`,
+    //         inlineClassName: 'text-xs bg-yellow-400 text-black px-1 rounded absolute mt-[-1.5rem] ml-1 z-50',
+    //       },
+    //     },
+        
+    //   };
+
+    //   // Remove old decoration for this user
+    //   const oldDecorations = userCursorsRef.current[socketID] || [];
+    //   const newDecorations = editor.deltaDecorations(oldDecorations, [decoration]);
+    //   userCursorsRef.current[socketID] = newDecorations;
+    // });
   };
+
+ 
 
   useEffect(() => {
 
@@ -53,11 +93,17 @@ function EditorPage({ socketRef, meetingID ,onCodeChange }) {
     };
   }, [socketRef.current]);
 
+  
+
+  
+  
+  
+
   return (
     <Editor
       height="100vh"
       width="65vw"
-      defaultLanguage="javascript"
+      language={language}
       value={code}
       options={editorOptions}
       onMount={handleEditorMount}
@@ -67,3 +113,4 @@ function EditorPage({ socketRef, meetingID ,onCodeChange }) {
 }
 
 export default EditorPage;
+//rohit

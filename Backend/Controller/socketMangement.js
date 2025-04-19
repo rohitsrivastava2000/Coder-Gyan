@@ -53,6 +53,16 @@ export const connectToSocket=(server)=>{
         socket.on('sync-code',({code,socketID})=>{
             io.to(socketID).emit('code-change',{code})
         })
+
+        // socket.on('cursor-position',({position,meetingID})=>{
+        //     console.log(connections[socket.id]+ "   " + position.lineNumber + "   " + meetingID)
+            
+        //     socket.in(meetingID).emit('cursor-position',{username:connections[socket.id],socketID:socket.id,position})
+        // })
+        socket.on('language-change',({language,meetingID})=>{
+            socket.in(meetingID).emit('language-change',{language});
+        })
+
         socket.on('disconnecting',()=>{
             const rooms=[...socket.rooms];
             rooms.forEach((roomId)=>{

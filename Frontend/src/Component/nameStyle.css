@@ -1,0 +1,17 @@
+.remote-cursor {
+  border-left: 2px solid #facc15;
+  margin-left: -1px;
+  height: 100%;
+}
+
+.remote-cursor-label::after {
+  content: attr(data-label);
+  position: absolute;
+  background: #facc15;
+  color: black;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 6px;
+  white-space: nowrap;
+}
