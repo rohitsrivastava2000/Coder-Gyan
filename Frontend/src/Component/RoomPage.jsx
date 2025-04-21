@@ -45,7 +45,9 @@ function RoomPage() {
       <div className="bg-[rgb(35,37,50)] p-8 rounded-2xl shadow-lg w-full max-w-md flex flex-col gap-6">
         {/* Logo */}
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">Coder'$ Gyan</h1>
+        <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 tracking-wide">
+            Coder<span className="text-yellow-400">'$</span> Gyan
+          </h1>
           <p className="text-gray-400 text-sm">Join a room and start collaborating</p>
         </div>
 

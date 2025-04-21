@@ -82,18 +82,18 @@ function MeetingRoom() {
     return cleanup;
   }, []);
 
-  useEffect(()=>{
-    socketRef.current.emit('language-change',{language,meetingID});
-    const handleLanguageChange=({language})=>{
+  useEffect(() => {
+    socketRef.current.emit("language-change", { language, meetingID });
+    const handleLanguageChange = ({ language }) => {
       setLanguage(language);
-    }
+    };
 
-    socketRef.current.on('language-change',handleLanguageChange);
+    socketRef.current.on("language-change", handleLanguageChange);
 
-    return ()=>{
-      socketRef.current.off('language-change',handleLanguageChange);
-    }
-  },[language])
+    return () => {
+      socketRef.current.off("language-change", handleLanguageChange);
+    };
+  }, [language]);
 
   if (!location.state) {
     return <Navigate to="/" />;
@@ -157,7 +157,6 @@ function MeetingRoom() {
               <option value="html">html</option>
               <option value="css">css</option>
               <option value="java">Java</option>
-              
             </select>
           </div>
           <button
@@ -174,17 +173,67 @@ function MeetingRoom() {
           </button>
         </div>
       </div>
+
       {/* Right Side Editor */}
-      <div className="w-[84%] h-full">
-        <EditorPage
-          socketRef={socketRef}
-          meetingID={meetingID}
-          language={language}
-          onCodeChange={(code) => {
-            codeRef.current = code;
-            setSyncCode(true);
-          }}
-        />
+      <div className="w-[84%] flex h-full">
+        <div className="h-full w-[65vw]">
+          <EditorPage
+            socketRef={socketRef}
+            meetingID={meetingID}
+            language={language}
+            onCodeChange={(code) => {
+              codeRef.current = code;
+              setSyncCode(true);
+            }}
+          />
+        </div>
+        {/* Right to Right side   */}
+        <div className="h-full w-[35vw] bg-[#1E1C2C] border-l border-gray-700 p-4 flex flex-col">
+          {/* Top Buttons */}
+          <div className="flex gap-4 mb-4">
+            <button className="flex-1 text-sm font-semibold py-2 bg-gray-800 hover:bg-gray-700 rounded-md text-white transition">
+              Question
+            </button>
+            <button className="flex-1 text-sm font-semibold py-2 bg-gray-800 hover:bg-gray-700 rounded-md text-white transition">
+              WhiteBoard
+            </button>
+          </div>
+
+          {/* Input Field */}
+          <div className="flex flex-col mb-4 flex-1">
+            <label htmlFor="input" className="text-sm text-gray-300 mb-1">
+              Input
+            </label>
+            <textarea
+              id="input"
+              placeholder="Enter input here..."
+              className="bg-[#2A273F] text-sm p-3 rounded-md text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-full"
+            />
+          </div>
+
+          {/* Output Field */}
+          <div className="flex flex-col mb-4">
+            <label htmlFor="output" className="text-sm text-gray-300 mb-1">
+              Output
+            </label>
+            <textarea
+              id="output"
+              placeholder="Output will appear here..."
+              readOnly
+              className="bg-[#2A273F] text-sm p-3 rounded-md text-white border border-gray-600 focus:outline-none resize-none h-60"
+            />
+          </div>
+
+          {/* Run Code Button */}
+          <div>
+            <button
+              onClick={() => console.log("Run code clicked")}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-bold transition"
+            >
+              ▶ Run Code
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
