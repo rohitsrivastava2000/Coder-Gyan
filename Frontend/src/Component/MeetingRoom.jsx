@@ -9,6 +9,7 @@ import Clients from "./Clients";
 import EditorPage from "./EditorPage";
 import { SocketContext } from "../Context/myContext";
 import toast from "react-hot-toast";
+import axios from 'axios';
 
 function MeetingRoom() {
   const { meetingID } = useParams();
@@ -20,6 +21,8 @@ function MeetingRoom() {
   const location = useLocation();
   const { socket } = useContext(SocketContext);
   const [syncCode, setSyncCode] = useState(false);
+  const [inputField,setInputField]=useState("");
+  const [outputField,setOutputField]=useState("");
 
   useEffect(() => {
     const init = () => {
@@ -113,6 +116,27 @@ function MeetingRoom() {
     navigate("/");
   };
 
+  const handleRunCode=async ()=>{
+    try {
+      const response=await axios.post('http://localhost:8000/api/v1/runcode',{
+        language:language,
+        code:codeRef.current,
+        input:inputField,
+      })
+
+      console.log(response.data);
+      if(response){
+        setOutputField(response.data.message);
+      }
+
+
+    } catch (error) {
+      toast.error("Something went wrong");
+      console.log(error);
+    }
+    
+  }
+
   return (
     <div className="w-full h-screen flex bg-[rgb(28,26,38)] text-white">
       {/* Left Sidebar */}
@@ -154,8 +178,8 @@ function MeetingRoom() {
               className="w-full font-bold p-2 rounded-md bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition  text-center"
             >
               <option value="javascript">JavaScript</option>
-              <option value="html">html</option>
-              <option value="css">css</option>
+              <option value="python">Python</option>
+              <option value="cpp">C++</option>
               <option value="java">Java</option>
             </select>
           </div>
@@ -206,6 +230,8 @@ function MeetingRoom() {
             </label>
             <textarea
               id="input"
+              value={inputField}
+              onChange={(e)=>setInputField(e.target.value)}
               placeholder="Enter input here..."
               className="bg-[#2A273F] text-sm p-3 rounded-md text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-full"
             />
@@ -219,6 +245,7 @@ function MeetingRoom() {
             <textarea
               id="output"
               placeholder="Output will appear here..."
+              value={outputField}
               readOnly
               className="bg-[#2A273F] text-sm p-3 rounded-md text-white border border-gray-600 focus:outline-none resize-none h-60"
             />
@@ -227,7 +254,7 @@ function MeetingRoom() {
           {/* Run Code Button */}
           <div>
             <button
-              onClick={() => console.log("Run code clicked")}
+              onClick={handleRunCode}
               className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-bold transition"
             >
               ▶ Run Code

@@ -231,7 +231,7 @@ function PlayGround() {
                 placeholder="Project Title"
                 value={formData.title}
                 onChange={handleChange}
-                onKeyDown={handleInpurEnter}
+                onKeyDown={handleInputEnterCreate}
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
                 required
               />
@@ -240,7 +240,7 @@ function PlayGround() {
                 placeholder="Project Description"
                 value={formData.description}
                 onChange={handleChange}
-                onKeyDown={handleInpurEnter}
+                onKeyDown={handleInputEnterCreate}
                 rows="3"
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
               ></textarea>
@@ -250,7 +250,7 @@ function PlayGround() {
                 placeholder="Your Username"
                 value={formData.username}
                 onChange={handleChange}
-                onKeyDown={handleInpurEnter}
+                onKeyDown={handleInputEnterCreate}
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
                 required
               />
@@ -260,7 +260,7 @@ function PlayGround() {
                 placeholder="Meeting ID"
                 value={formData.meetingId}
                 onChange={handleChange}
-                onKeyDown={handleInpurEnter}
+                onKeyDown={handleInputEnterCreate}
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
                 required
               />
