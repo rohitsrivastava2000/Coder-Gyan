@@ -63,6 +63,14 @@ export const connectToSocket=(server)=>{
             socket.in(meetingID).emit('language-change',{language});
         })
 
+        socket.on('input-field-change',({inputField,meetingID})=>{
+            socket.in(meetingID).emit('input-field-change',{inputField});
+        })
+        socket.on('output-field-change',({outputField,meetingID})=>{
+            socket.in(meetingID).emit('output-field-change',{outputField});
+        })
+
+
         socket.on('disconnecting',()=>{
             const rooms=[...socket.rooms];
             rooms.forEach((roomId)=>{

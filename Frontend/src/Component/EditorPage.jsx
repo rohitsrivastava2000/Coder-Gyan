@@ -33,7 +33,7 @@ function EditorPage({ socketRef, meetingID ,onCodeChange,language }) {
       onCodeChange(updatedCode);
       socketRef.current.emit('code-change', { code: updatedCode, meetingID });
     });
-
+    //TODO adding the mouse cursor
     // Inside EditorPage, after editorRef is available
     // editor.onDidChangeCursorSelection((e) => {
     //   const position = e.selection.getPosition();
@@ -83,6 +83,7 @@ function EditorPage({ socketRef, meetingID ,onCodeChange,language }) {
       if (editor && code !== editor.getValue()) {
         isRemoteUpdate.current = true;
         editor.setValue(code);
+        onCodeChange(code);
       }
     };
 

@@ -98,6 +98,32 @@ function MeetingRoom() {
     };
   }, [language]);
 
+  useEffect(()=>{
+    socketRef.current.emit('input-field-change',{inputField,meetingID});
+    const handleInputFieldChange=({inputField})=>{
+        setInputField(inputField);
+    }
+    socketRef.current.on('input-field-change',handleInputFieldChange);
+
+    return ()=>{
+      socketRef.current.off('input-field-change',handleInputFieldChange);
+    }
+  },[inputField])
+
+  useEffect(()=>{
+    socketRef.current.emit('output-field-change',{outputField,meetingID});
+    const handleOutputFieldChange=({outputField})=>{
+        setOutputField(outputField);
+    }
+    socketRef.current.on('output-field-change',handleOutputFieldChange);
+
+    return ()=>{
+      socketRef.current.off('output-field-change',handleOutputFieldChange);
+    }
+  },[outputField])
+
+
+
   if (!location.state) {
     return <Navigate to="/" />;
   }
@@ -131,11 +157,15 @@ function MeetingRoom() {
 
 
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error("Something went wrong, Try another language");
       console.log(error);
     }
     
   }
+
+
+  
+  
 
   return (
     <div className="w-full h-screen flex bg-[rgb(28,26,38)] text-white">

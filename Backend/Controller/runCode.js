@@ -7,6 +7,12 @@ const RunCode = async (req, res) => {
   const { language, code,input="" } = req.body;
   const fs = await import("fs/promises");
 
+  if (!code) {
+    return res.status(400).json({
+      success: false,
+      message: "No Output",
+    });
+  }
   console.log("jiiiiiiiiiiiiiiiiiiii")
   console.log(language);
   console.log(code);
@@ -16,11 +22,13 @@ const RunCode = async (req, res) => {
   // Map language info
   const langFileMap = {
     python: { ext: "py", dockerfile: "Dockerfile.python" },
-   // cpp: { ext: "cpp", dockerfile: "Dockerfile.cpp" },
+    cpp: { ext: "cpp", dockerfile: "Dockerfile.cpp" },
+    java: { ext: "java", dockerfile: "Dockerfile.java" },
+    javascript: { ext: "js", dockerfile: "Dockerfile.js" },
   };
 
   const lang = langFileMap[language] || [];
-//   console.log(lang)
+  console.log(lang)
   if (!lang) return res.status(400).send("Unsupported language");
 
   const filePath = `./Languages/${language}-runner.${lang.ext}`;
@@ -32,6 +40,7 @@ const RunCode = async (req, res) => {
   const dockerfilePath = `Dockerfiles/${lang.dockerfile}`;
 
   // Build the Docker image
+  //TODO Handling the Error as an ouput part 
   exec(
     `docker build -f ${dockerfilePath} -t ${dockerImage} .`,
     (err, stdout, stderr) => {
@@ -48,6 +57,8 @@ const RunCode = async (req, res) => {
       });
     }
   );
+  
+  
 };
 
 export default RunCode;
