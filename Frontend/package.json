@@ -17,6 +17,7 @@
     "axios": "^1.8.4",
     "boring-avatars": "^1.11.2",
     "codemirror": "^6.0.1",
+    "lucide-react": "^0.511.0",
     "monaco-editor": "^0.52.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

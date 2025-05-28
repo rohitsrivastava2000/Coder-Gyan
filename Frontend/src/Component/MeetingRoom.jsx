@@ -10,6 +10,7 @@ import EditorPage from "./EditorPage";
 import { SocketContext } from "../Context/myContext";
 import toast from "react-hot-toast";
 import axios from 'axios';
+import WhiteBoard from "./WhitBoard";
 
 function MeetingRoom() {
   const { meetingID } = useParams();
@@ -23,6 +24,8 @@ function MeetingRoom() {
   const [syncCode, setSyncCode] = useState(false);
   const [inputField,setInputField]=useState("");
   const [outputField,setOutputField]=useState("");
+  const [showWhiteBoard, setShowWhiteBoard] = useState(false);
+
 
   useEffect(() => {
     const init = () => {
@@ -98,6 +101,19 @@ function MeetingRoom() {
     };
   }, [language]);
 
+   useEffect(() => {
+    socketRef.current.emit("enable-whiteboard", { showWhiteBoard, meetingID });
+    const enableWhiteBoard = ({ showWhiteBoard }) => {
+      setShowWhiteBoard(showWhiteBoard);
+    };
+
+    socketRef.current.on("enable-whiteboard", enableWhiteBoard);
+
+    return () => {
+      socketRef.current.off("enable-whiteboard", enableWhiteBoard);
+    };
+  }, [showWhiteBoard]);
+
   useEffect(()=>{
     socketRef.current.emit('input-field-change',{inputField,meetingID});
     const handleInputFieldChange=({inputField})=>{
@@ -163,8 +179,11 @@ function MeetingRoom() {
     
   }
 
-
+  const handleWhiteBoard=()=>{
+   setShowWhiteBoard((pre)=>!pre)
+  }
   
+  //{ showWhiteBoard ? <WhiteBoard/>:""}
   
 
   return (
@@ -230,7 +249,7 @@ function MeetingRoom() {
 
       {/* Right Side Editor */}
       <div className="w-[84%] flex h-full">
-        <div className="h-full w-[65vw]">
+        {showWhiteBoard ? <WhiteBoard socketRef={socketRef} meetingID={meetingID}/> : <div className="h-full w-[65vw]">
           <EditorPage
             socketRef={socketRef}
             meetingID={meetingID}
@@ -241,6 +260,7 @@ function MeetingRoom() {
             }}
           />
         </div>
+        }
         {/* Right to Right side   */}
         <div className="h-full w-[35vw] bg-[#1E1C2C] border-l border-gray-700 p-4 flex flex-col">
           {/* Top Buttons */}
@@ -248,7 +268,7 @@ function MeetingRoom() {
             <button className="flex-1 text-sm font-semibold py-2 bg-gray-800 hover:bg-gray-700 rounded-md text-white transition">
               Question
             </button>
-            <button className="flex-1 text-sm font-semibold py-2 bg-gray-800 hover:bg-gray-700 rounded-md text-white transition">
+            <button onClick={handleWhiteBoard} className="flex-1 text-sm font-semibold py-2 bg-gray-800 hover:bg-gray-700 rounded-md text-white transition">
               WhiteBoard
             </button>
           </div>
