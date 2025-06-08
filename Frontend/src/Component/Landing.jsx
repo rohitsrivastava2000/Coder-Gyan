@@ -1,10 +1,49 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Typewriter } from "react-simple-typewriter";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { authentication, createUser } from '../Features/userDetailSlice';
+import axios from 'axios';
+import { notify } from '../toastify';
 
 function LandingPage() {
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+  
+  const { userData, loading,isLogin ,error } = useSelector((state) => state.app);
+  const baseUrl=useSelector((state)=>state.app.baseURL);
+
+  useEffect(() => {
+    dispatch(authentication());
+    dispatch(createUser());
+  }, []);
+
+  const handleLogout=async ()=>{
+    console.log("aaya to hu")
+    try {
+      const response=await axios.get(baseUrl+'/auth/logout',{
+        withCredentials:true
+      })
+      if(response.data.success){
+        dispatch(authentication());
+
+        notify(response.data)
+        navigate('/')
+        
+      }
+
+    } catch (error) {
+      notify(error.response?.data);
+      console.log(error);
+    }
+  }
+
+  if (loading) return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  // if (error) return <div className="flex justify-center items-center min-h-screen text-red-600">Error: {error}</div>;
+
+
   return (
     <div className="h-full w-full bg-gradient-to-br from-sky-100 to-indigo-200 flex flex-col">
       {/* Navbar */}
@@ -22,20 +61,27 @@ function LandingPage() {
               Coder<span className="text-yellow-500">'$</span> Gyan
             </h1>
           </div>
-          <div>
-            <h2>Project Under Contruction,but some feature are workeble , click on getStarted</h2>
-          </div>
+         
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
             <p className="hover:text-indigo-600 transition duration-300 cursor-pointer">
               About
             </p>
-            <p className="hover:text-indigo-600 transition duration-300 cursor-pointer">
+            {!isLogin ? <><p className="hover:text-indigo-600 transition duration-300 cursor-pointer" onClick={()=>navigate('/login')} >
               Login
             </p>
-            <p className="hover:text-indigo-600 transition duration-300 cursor-pointer">
+            <p className="hover:text-indigo-600 transition duration-300 cursor-pointer" onClick={()=>navigate('/signup')} >
               Signup
+            </p></>
+            :
+            <><p className="hover:text-indigo-600 transition duration-300 cursor-pointer" onClick={()=>navigate('/playground')} >
+              Dashboard
             </p>
+            <p className="hover:text-red-600 transition duration-300 cursor-pointer" onClick={()=>handleLogout()}>
+              Logout
+            </p></>
+            }
+            
           </div>
         </div>
       </nav>
