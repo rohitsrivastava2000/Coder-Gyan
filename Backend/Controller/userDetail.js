@@ -14,6 +14,7 @@ export const getInfo=async(req,res)=>{
     }
 
     const detail={
+        userId:user._id,
         username:user.userName,
         email:user.email
     }

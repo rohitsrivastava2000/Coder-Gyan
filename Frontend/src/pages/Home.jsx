@@ -4,6 +4,7 @@ import { authentication, createUser } from '../Features/userDetailSlice';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { notify } from '../toastify';
+import { persistor } from '../Store/store.js';
 
 function Home() {
   
@@ -18,6 +19,12 @@ function Home() {
     dispatch(createUser());
   }, []);
 
+
+const resetReduxPersist = () => {
+  persistor.purge(); // Clears redux-persist storage
+};
+
+
   const handleLogout=async ()=>{
     console.log("aaya to hu")
     try {
@@ -26,7 +33,7 @@ function Home() {
       })
       if(response.data.success){
         dispatch(authentication());
-
+        resetReduxPersist();
         notify(response.data)
         navigate('/')
         

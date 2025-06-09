@@ -3,7 +3,7 @@ import { Typewriter } from "react-simple-typewriter";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { authentication, createUser } from '../Features/userDetailSlice';
+import { authentication, createUser, resetUserState } from '../Features/userDetailSlice';
 import axios from 'axios';
 import { notify } from '../toastify';
 
@@ -28,7 +28,7 @@ function LandingPage() {
       })
       if(response.data.success){
         dispatch(authentication());
-
+        dispatch(resetUserState());
         notify(response.data)
         navigate('/')
         

@@ -54,7 +54,13 @@ export const userDetail=createSlice({
     reducers:{
         setOtpSend:(state,action)=>{
           state.isOtpSend=action.payload;
-        }
+        },
+        resetUserState: (state) => {
+        state.userData = null;
+        state.isLogin = false;
+        state.error = null;
+        state.loading = false;
+        },
     },
     extraReducers: (builder) => {
     builder
@@ -86,5 +92,5 @@ export const userDetail=createSlice({
       });
   },
 })
-export const { setOtpSend } = userDetail.actions;
+export const { setOtpSend,resetUserState } = userDetail.actions;
 export default userDetail.reducer;
