@@ -10,6 +10,7 @@ import { connectToSocket } from "./Controller/socketMangement.js";
 import codeRunRouter from './Routes/runcode.js'
 import authRoute from './Routes/authRoute.js';
 import userRoute from './Routes/userRoute.js';
+import projectRoute from "./Routes/projectRoute.js";
 
 const app = express();
 const server = createServer(app);
@@ -29,6 +30,7 @@ app.use(cors({
 app.use('/api/v1',codeRunRouter);
 app.use('/api/auth',authRoute);
 app.use('/api/user',userRoute);
+app.use('/api/project',projectRoute);
 
 
 app.get('/', (req, res) => {

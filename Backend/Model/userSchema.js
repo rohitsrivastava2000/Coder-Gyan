@@ -35,6 +35,12 @@ const userSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  projectId: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+    },
+  ],
   tempUserExpiredAt: {
     type: Date,
     default: null, // timestamp 2 min in future

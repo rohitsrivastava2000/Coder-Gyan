@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const newPrjectSchema=mongoose.Schema({
+const prjectSchema=mongoose.Schema({
     title:{
         type:String,
     },
@@ -15,10 +15,16 @@ const newPrjectSchema=mongoose.Schema({
     },
     code:{
         type:String,
+    },
+    language:{
+        type:String,
+    },
+    username:{
+        type:String
     }
 })
 
-const newProjectModel= mongoose.models.User || mongoose.model('NewProject',newPrjectSchema)
+const projectModel= mongoose.models.Project || mongoose.model('Project',prjectSchema)
 
-export default newProjectModel
+export default projectModel
 
