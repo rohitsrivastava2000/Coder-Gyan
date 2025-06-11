@@ -92,12 +92,7 @@ function EditorPage({ socketRef, meetingID ,onCodeChange,language }) {
     return () => {
       socketRef.current.off('code-change', handleCodeChange);
     };
-  }, [socketRef.current]);
-
-  
-
-  
-  
+  }, [socketRef.current]); 
   
 
   return (

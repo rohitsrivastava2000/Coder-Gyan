@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { setAllUserProject } from "../Features/userDetailSlice";
+import { setAllUserProject, setCurrentProjectId } from "../Features/userDetailSlice";
 import { BsPencilSquare } from "react-icons/bs";
 import { notify } from "../toastify.js";
 
@@ -18,17 +18,19 @@ function PlayGround() {
   const [currentProject,setCurrentProject]=useState(null);
   const [currentTitleUpdate,setCurrentTitleUpdate]=useState("");
   const [currentDescriptionUpdate,setCurrentDescriptionUpdate]=useState("");
-
+  
+  const { userData, baseURL } = useSelector((state) => state.app);
+  const dispatch=useDispatch();
 
   const navigator = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    username: "",
+    username: userData.username,
     meetingId: "",
   });
   const [joinData, setJoinData] = useState({
-    username: "",
+    username: userData.username,
     meetingId: "",
   });
 
@@ -39,8 +41,6 @@ function PlayGround() {
   //   "Task Manager",
   // ];
 
-  const { userData, baseURL } = useSelector((state) => state.app);
-  const dispatch=useDispatch();
 
 
 
@@ -67,11 +67,11 @@ function PlayGround() {
     setFormData({
       title: "",
       description: "",
-      username: "",
+      username: userData.username,
       meetingId: "",
     });
     setJoinData({
-      username: "",
+      username: userData.username,
       meetingId: "",
     });
   };
@@ -83,7 +83,7 @@ function PlayGround() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
     // You can add logic here to create the project
@@ -96,13 +96,29 @@ function PlayGround() {
       toast.error("All fields are required");
       return;
     }
-
-    navigator(`/playground/${formData.meetingId}`, {
-      state: {
-        username: formData.username, // This was also wrongly written
-      },
-    });
-    handleClose();
+    try {
+       const response=await axios.post(baseURL+'/project/new-project',{
+      title:formData.title,
+      description:formData.description,
+      username:formData.username,
+      meetingId:formData.meetingId
+    },{
+      withCredentials:true
+    })
+    if(response.data.success){
+      toast.success("Project Created")
+      console.log(response.data.projectId);
+      dispatch(setCurrentProjectId(response.data.projectId));
+      navigator(`/playground/${formData.meetingId}`, {
+        state: {
+          username: formData.username, // This was also wrongly written
+        },
+      });
+      handleClose();
+    }
+    } catch (error) {
+      console.log(error,"something went wront on handleSubmit")
+    }
   };
 
   //Join Meeting
@@ -324,6 +340,7 @@ function PlayGround() {
                 onKeyDown={handleInputEnterCreate}
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
                 required
+                readOnly
               />
               <input
                 type="text"
@@ -379,6 +396,7 @@ function PlayGround() {
                 onKeyDown={handleInputEnterJoin}
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
                 required
+                readOnly
               />
               <input
                 type="text"
@@ -425,7 +443,7 @@ function PlayGround() {
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
                 required
               />
-              <input
+              <textarea
                 type="text"
                 name="description"
                 placeholder="enter description"
@@ -434,7 +452,7 @@ function PlayGround() {
                 
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
                 required
-              />
+              /><textarea/>
 
               <div className="flex justify-end space-x-3">
                 <button

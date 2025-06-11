@@ -11,6 +11,7 @@ import { SocketContext } from "../Context/myContext";
 import toast from "react-hot-toast";
 import axios from 'axios';
 import WhiteBoard from "./WhitBoard";
+import { useSelector } from "react-redux";
 
 function MeetingRoom() {
   const { meetingID } = useParams();
@@ -25,6 +26,8 @@ function MeetingRoom() {
   const [inputField,setInputField]=useState("");
   const [outputField,setOutputField]=useState("");
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
+
+  const {currentProjectId,baseURL}=useSelector((state)=>state.app);
 
 
   useEffect(() => {
@@ -183,7 +186,25 @@ function MeetingRoom() {
    setShowWhiteBoard((pre)=>!pre)
   }
   
-  //{ showWhiteBoard ? <WhiteBoard/>:""}
+  const handleSaveCode=async()=>{
+      try {
+        console.log(currentProjectId)
+        const response=await axios.post(baseURL+'/project/save-project',{
+        projectId:currentProjectId,
+        code:codeRef.current,
+        language:language,
+      },{
+        withCredentials:true
+      })
+
+      console.log(response);
+      if(response.data.success){
+        toast.success("Project Saved!");
+      }
+      } catch (error) {
+        console.log(error,"something went wron on handleSaveCode");
+      }
+  }
   
 
   return (
@@ -265,8 +286,8 @@ function MeetingRoom() {
         <div className="h-full w-[35vw] bg-[#1E1C2C] border-l border-gray-700 p-4 flex flex-col">
           {/* Top Buttons */}
           <div className="flex gap-4 mb-4">
-            <button className="flex-1 text-sm font-semibold py-2 bg-gray-800 hover:bg-gray-700 rounded-md text-white transition">
-              Question
+            <button className="flex-1 text-sm font-semibold py-2 bg-gray-800 hover:bg-gray-700 rounded-md text-white transition" onClick={()=>handleSaveCode()} >
+              Save
             </button>
             <button onClick={handleWhiteBoard} className="flex-1 text-sm font-semibold py-2 bg-gray-800 hover:bg-gray-700 rounded-md text-white transition">
               WhiteBoard
