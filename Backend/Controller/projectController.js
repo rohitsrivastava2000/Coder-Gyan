@@ -52,7 +52,9 @@ export const newProject = async (req, res) => {
 export const saveProject = async (req, res) => {
   try {
     const { projectId, code, language } = req.body;
-
+    console.log(projectId)
+    console.log(code)
+    console.log(language)
     if (!projectId)
       return res.status(401).json({
         success: false,
