@@ -1,13 +1,26 @@
+import axios from "axios";
 import React, { useState } from "react";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import { setAllUserProject } from "../Features/userDetailSlice";
+import { BsPencilSquare } from "react-icons/bs";
+import { notify } from "../toastify.js";
 
 function PlayGround() {
   const [activeTab, setActiveTab] = useState("welcome");
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [showJoinProjectModal, setShowJoinProjectModal] = useState(false);
-  const navigator=useNavigate();
+  const [userProjects,setUserProjects]=useState([]);
+  const [showUpdateModel,setShowUpdateModel]=useState(false);
+  const [currentProject,setCurrentProject]=useState(null);
+  const [currentTitleUpdate,setCurrentTitleUpdate]=useState("");
+  const [currentDescriptionUpdate,setCurrentDescriptionUpdate]=useState("");
+
+
+  const navigator = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -19,12 +32,17 @@ function PlayGround() {
     meetingId: "",
   });
 
-  const userProjects = [
-    "React Portfolio",
-    "Chat App",
-    "Blog Website",
-    "Task Manager",
-  ];
+  // const userProjects = [
+  //   "React Portfolio",
+  //   "Chat App",
+  //   "Blog Website",
+  //   "Task Manager",
+  // ];
+
+  const { userData, baseURL } = useSelector((state) => state.app);
+  const dispatch=useDispatch();
+
+
 
   const createID = (e) => {
     setFormData((prev) => ({ ...prev, meetingId: uuidv4() }));
@@ -42,64 +60,61 @@ function PlayGround() {
     }));
   };
 
-  
   const handleClose = () => {
-      setShowNewProjectModal(false);
-      setShowJoinProjectModal(false);
-      setFormData({
-          title: "",
-          description: "",
-          username: "",
-          meetingId: "",
-        });
-        setJoinData({
-            username: "",
-            meetingId: "",
-        });
-    };
-    
+    setShowNewProjectModal(false);
+    setShowJoinProjectModal(false);
+    setShowUpdateModel(false);
+    setFormData({
+      title: "",
+      description: "",
+      username: "",
+      meetingId: "",
+    });
+    setJoinData({
+      username: "",
+      meetingId: "",
+    });
+  };
 
-    const handleInputEnterCreate=(e)=>{
-        // console.log(e.code);
-        if(e.code=='Enter'){
-            handleSubmit();
-        }
-      }
+  const handleInputEnterCreate = (e) => {
+    // console.log(e.code);
+    if (e.code == "Enter") {
+      handleSubmit();
+    }
+  };
 
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Form submitted:", formData);
-        // You can add logic here to create the project
-        if (
-            !formData.meetingId ||
-            !formData.username ||
-            !formData.title ||
-            !formData.description
-          ) {
-            toast.error("All fields are required");
-            return;
-          }
-          
-          navigator(`/playground/${formData.meetingId}`, {
-            state: {
-              username: formData.username, // This was also wrongly written
-            },
-          });
-          handleClose();
-          
-      };  
-    
-    
-    //Join Meeting 
-    const handleInputEnterJoin=(e)=>{
-        // console.log(e.code);
-        if(e.code=='Enter'){
-            handleJoinSubmit();
-        }
-      }
-    const joinRoom = () => {
-      setShowJoinProjectModal(true);
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form submitted:", formData);
+    // You can add logic here to create the project
+    if (
+      !formData.meetingId ||
+      !formData.username ||
+      !formData.title ||
+      !formData.description
+    ) {
+      toast.error("All fields are required");
+      return;
+    }
+
+    navigator(`/playground/${formData.meetingId}`, {
+      state: {
+        username: formData.username, // This was also wrongly written
+      },
+    });
+    handleClose();
+  };
+
+  //Join Meeting
+  const handleInputEnterJoin = (e) => {
+    // console.log(e.code);
+    if (e.code == "Enter") {
+      handleJoinSubmit();
+    }
+  };
+  const joinRoom = () => {
+    setShowJoinProjectModal(true);
+  };
   const handleChangeForJoin = (e) => {
     setJoinData((prev) => ({
       ...prev,
@@ -107,25 +122,77 @@ function PlayGround() {
     }));
   };
 
-  
-
   const handleJoinSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", joinData);
     // You can add logic here to create the project
     if (!joinData.meetingId || !joinData.username) {
-        toast.error("All fields are required");
-        return;
-      }
-      
-      navigator(`/playground/${joinData.meetingId}`, {
-        state: {
-          username: joinData.username,
-        },
-      });
-      
+      toast.error("All fields are required");
+      return;
+    }
+
+    navigator(`/playground/${joinData.meetingId}`, {
+      state: {
+        username: joinData.username,
+      },
+    });
+
     handleClose();
   };
+
+  //API Calling
+ useEffect(() => {
+  const fetchProject = async () => {
+    try {
+      const allProject = await axios.get(
+        baseURL + "/project/get-all-project",
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("All project is", allProject);
+      dispatch(setAllUserProject(allProject.data.projects))
+      setUserProjects(allProject.data.projects);
+    } catch (error) {
+      console.log("Error on showAllProject: " + error);
+    }
+  };
+
+  if (activeTab === "projects") {
+    fetchProject();
+  }
+}, [activeTab]);
+
+
+  const updateModel=(project)=>{
+    setCurrentProject(project);
+    setCurrentTitleUpdate(project.title);
+    setCurrentDescriptionUpdate(project.description);
+    setShowUpdateModel(true);
+  }
+
+  const handleUpdateModel=async(e)=>{
+    e.preventDefault();
+    try {
+      const response=await axios.post(baseURL+`/project/update-project/${currentProject._id}`,{
+        title:currentTitleUpdate,
+        description:currentDescriptionUpdate
+      },
+      {
+        withCredentials:true
+      }
+    )
+
+    console.log(response)
+    if(response.data.success)
+     notify(response.data)
+    
+    setShowUpdateModel(false);
+    } catch (error) {
+      console.log(error);
+      console.log("error on handleUpdateModel");
+    }
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -190,7 +257,7 @@ function PlayGround() {
           {activeTab === "welcome" && (
             <h1 className="text-3xl font-bold">
               Welcome Back,{" "}
-              <span className="text-blue-400">Rohit Kumar Srivastava</span>
+              <span className="text-blue-400">{`${userData.username}`}</span>
             </h1>
           )}
 
@@ -203,11 +270,15 @@ function PlayGround() {
                     key={index}
                     className="bg-gray-800 w-[30%] min-w-[200px] p-4 rounded-xl hover:bg-gray-700 transition"
                   >
-                    <h3 className="text-lg font-bold text-blue-400">
-                      {project}
+                    <div className="flex justify-between" >
+                          <h3 className="text-lg font-bold text-blue-400">
+                      {project.title}
                     </h3>
-                    <p className="text-sm text-gray-400 mt-2">
-                      Project description goes here.
+                    <BsPencilSquare className="!text-[rgb(81,162,255)] hover:scale-110  cursor-pointer" onClick={()=>updateModel(project)} />
+                    </div>
+                    
+                    <p className="text-sm text-gray-400 mt-2 line-clamp-3">
+                      {project.description}
                     </p>
                   </div>
                 ))}
@@ -339,6 +410,53 @@ function PlayGround() {
           </div>
         </div>
       )}
+      {showUpdateModel && (
+        <div className="fixed inset-0 backdrop-blur-sm  bg-opacity-90 flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-xl p-6 w-[90%] max-w-md space-y-4 border border-gray-700 shadow-xl">
+            
+            <form onSubmit={handleUpdateModel} className="space-y-4">
+              <input
+                type="text"
+                name="title"
+                placeholder="enter title"
+                value={currentTitleUpdate}
+                onChange={(e)=>setCurrentTitleUpdate(e.target.value)}
+                
+                className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
+                required
+              />
+              <input
+                type="text"
+                name="description"
+                placeholder="enter description"
+                value={currentDescriptionUpdate}
+                onChange={(e)=>setCurrentDescriptionUpdate(e.target.value)}
+                
+                className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
+                required
+              />
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+
     </div>
   );
 }
