@@ -38,6 +38,7 @@ function MeetingRoom() {
       window.location.reload();
     } else {
       sessionStorage.removeItem("hasReloaded");
+      
     }
   }, []);
  
