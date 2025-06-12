@@ -1,6 +1,6 @@
 import express from 'express'
 import userAuth from '../Middleware/userAuth.js';
-import { deleteProject, getAllProject, joinProject, newProject, saveProject, updateProject } from '../Controller/projectController.js';
+import { deleteProject, getAllProject, gettingParticularProject, joinProject, newProject, saveProject, updateProject } from '../Controller/projectController.js';
 
 const projectRoute=express.Router();
 
@@ -11,6 +11,7 @@ projectRoute.post('/join-project',userAuth,joinProject);
 projectRoute.post('/update-project/:projectId',userAuth,updateProject);
 projectRoute.post('/delete-project/:projectId',userAuth,deleteProject);
 projectRoute.get('/get-all-project',userAuth,getAllProject);
+projectRoute.get('/getting-project-detail/:projectId',userAuth,gettingParticularProject);
 
 
 

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import {
   setAllUserProject,
@@ -38,12 +38,7 @@ function PlayGround() {
     meetingId: "",
   });
 
-  // const userProjects = [
-  //   "React Portfolio",
-  //   "Chat App",
-  //   "Blog Website",
-  //   "Task Manager",
-  // ];
+
 
   const createID = (e) => {
     setFormData((prev) => ({ ...prev, meetingId: uuidv4() }));
@@ -115,7 +110,7 @@ function PlayGround() {
         console.log(response.data.projectId);
         dispatch(setCurrentProjectId(response.data.projectId));
         dispatch(setCurrentMeetingId(formData.meetingId))
-        window.location.replace(`/playground/${formData.meetingId}`, {
+        navigator(`/playground/${formData.meetingId}`, {
           state: {
             username: formData.username, // This was also wrongly written
           },
@@ -171,7 +166,7 @@ function PlayGround() {
 
         console.log(joinData.meetingId)
         console.log(currentMeetingId);
-        window.location.replace(`/playground/${joinData.meetingId}`, {
+        navigator(`/playground/${joinData.meetingId}`, {
           state: {
             username: joinData.username,
           },
@@ -215,6 +210,20 @@ function PlayGround() {
     setCurrentDescriptionUpdate(project.description);
     setShowUpdateModel(true);
   };
+
+  const handleParticularProject=(project)=>{
+    setCurrentProject(project);
+    setCurrentProjectId(project._id);
+
+    navigator(`/playground/${project.meetingId}`, {
+          state: {
+            username: project.username,
+          },
+          
+        },
+      )
+
+  }
 
   const handleUpdateModel = async (e) => {
     e.preventDefault();
@@ -310,11 +319,11 @@ function PlayGround() {
           {activeTab === "projects" && (
             <div>
               <h2 className="text-2xl font-semibold mb-6">My Projects</h2>
-              <div className="flex flex-wrap gap-6">
+              <div className="flex flex-wrap gap-6"  >
                 {userProjects.map((project, index) => (
                   <div
                     key={index}
-                    className="bg-gray-800 w-[30%] min-w-[200px] p-4 rounded-xl hover:bg-gray-700 transition"
+                    className="bg-gray-800 w-[30%] min-w-[200px] p-4 rounded-xl hover:bg-gray-700 transition" onClick={()=>handleParticularProject(project)}
                   >
                     <div className="flex justify-between">
                       <h3 className="text-lg font-bold text-blue-400">

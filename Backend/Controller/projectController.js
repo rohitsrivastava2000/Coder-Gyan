@@ -240,3 +240,30 @@ export const getAllProject=async(req,res)=>{
         })
     }
 }
+
+export const gettingParticularProject=async(req,res)=>{
+  try {
+    const projectId = req.params.projectId;
+    console.log("projectId is :",projectId)
+    if(!projectId){
+      return res.status(401).json({
+        success:false,
+        message:"Project is Missing"
+      })
+    }
+
+    const project=await Project.findById(projectId);
+
+    return res.status(200).json({
+      success:true,
+      message:"Project Get Successfully",
+      project:project
+    })
+
+  } catch (error) {
+    return res.status(500).json({
+      success:false,
+      message:"somthing went wron on the gettingParticularProject"
+    })
+  }
+}

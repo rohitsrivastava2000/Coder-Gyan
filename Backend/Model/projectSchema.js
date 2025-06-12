@@ -18,6 +18,7 @@ const prjectSchema=mongoose.Schema({
     },
     language:{
         type:String,
+        default:"cpp"
     },
     username:{
         type:String

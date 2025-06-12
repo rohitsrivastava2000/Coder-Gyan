@@ -29,7 +29,17 @@ function MeetingRoom() {
   const [outputField,setOutputField]=useState("");
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
   
+  useEffect(() => {
+    // Check if already reloaded once in this session
+    const hasReloaded = sessionStorage.getItem("hasReloaded");
 
+    if (!hasReloaded) {
+      sessionStorage.setItem("hasReloaded", "true");
+      window.location.reload();
+    } else {
+      sessionStorage.removeItem("hasReloaded");
+    }
+  }, []);
  
 
 
@@ -38,7 +48,22 @@ function MeetingRoom() {
   useEffect(() => {
     if (!userData?.username) return;
 
-    console.log(userData.username,"meetingroom mai hu")
+    const gettingProjectDetail=async()=>{
+      try {
+         const response=await axios.get(baseURL+`/project/getting-project-detail/${currentProjectId}`,{withCredentials:true})
+
+      if(response.data.success){
+        codeRef.current=response.data.project.code;
+        console.log(response.data.project.language,"yeh language aaraha hai");
+        setLanguage(response.data.project.language);
+      }
+      } catch (error) {
+        console.log(error,'somthing went wrong on gettingProjectDetail')
+      }
+    }
+
+    gettingProjectDetail();
+    
     const init = () => {
       socketRef.current = socket;
 
