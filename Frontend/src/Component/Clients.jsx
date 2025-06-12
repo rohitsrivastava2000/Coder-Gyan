@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import MakingAvatar from "./MakeingAvtar";
 
 const getName = (username) => {
+
   const parts = username.split(" ");
   let ans = parts[0];
 
@@ -13,6 +14,7 @@ const getName = (username) => {
 };
 
 function Clients({username}) {
+    console.log(username);
     const shortUserName=getName(username);
 
     

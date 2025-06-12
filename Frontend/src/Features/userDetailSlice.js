@@ -46,6 +46,7 @@ export const userDetail=createSlice({
         userData:[],
         projectData:[],
         currentProjectId:"",
+        currentMeetingId:"",
         loading:false,
         isLogin:false,
         error:null,
@@ -70,6 +71,9 @@ export const userDetail=createSlice({
         },
         setCurrentProjectId:(state,action)=>{
           state.currentProjectId=action.payload;
+        },
+        setCurrentMeetingId:(state,action)=>{
+          state.currentMeetingId=action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -102,5 +106,5 @@ export const userDetail=createSlice({
       });
   },
 })
-export const { setOtpSend,resetUserState,setAllUserProject,setCurrentProjectId } = userDetail.actions;
+export const { setOtpSend,resetUserState,setAllUserProject,setCurrentProjectId, setCurrentMeetingId } = userDetail.actions;
 export default userDetail.reducer;

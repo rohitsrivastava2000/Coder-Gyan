@@ -28,7 +28,7 @@ export const connectToSocket=(server)=>{
     io.on('connection',(socket)=>{
         socket.on('join',({meetingID,username})=>{
             console.log(socket.id)
-            // console.log(name)
+            console.log(meetingID,"vvvv",username)
             connections[socket.id]=username;
             socket.join(meetingID);
             let clients=getAllConnectedClients(meetingID);

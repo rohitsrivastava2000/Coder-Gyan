@@ -11,10 +11,12 @@ import { SocketContext } from "../Context/myContext";
 import toast from "react-hot-toast";
 import axios from 'axios';
 import WhiteBoard from "./WhitBoard";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentMeetingId } from "../Features/userDetailSlice";
 
 function MeetingRoom() {
-  const { meetingID } = useParams();
+  const {currentProjectId,baseURL,userData,currentMeetingId}=useSelector((state)=>state.app);
+  const  meetingID  = currentMeetingId;
   const [clients, setClients] = useState([]);
   const [language, setLanguage] = useState("javascript");
   const navigate = useNavigate();
@@ -26,11 +28,17 @@ function MeetingRoom() {
   const [inputField,setInputField]=useState("");
   const [outputField,setOutputField]=useState("");
   const [showWhiteBoard, setShowWhiteBoard] = useState(false);
+  
 
-  const {currentProjectId,baseURL}=useSelector((state)=>state.app);
+ 
+
+
 
 
   useEffect(() => {
+    if (!userData?.username) return;
+
+    console.log(userData.username,"meetingroom mai hu")
     const init = () => {
       socketRef.current = socket;
 
@@ -44,11 +52,11 @@ function MeetingRoom() {
 
       socketRef.current.emit("join", {
         meetingID,
-        username: location.state?.username,
+        username: userData.username,
       });
 
       const handleJoin = ({ clients, username, socketID }) => {
-        if (username !== location.state?.username) {
+        if (username !== userData.username) {
           toast.success(`${username} joined the room`);
           console.log(`${username} joined`);
         }
@@ -143,9 +151,10 @@ function MeetingRoom() {
 
 
 
-  if (!location.state) {
+   if (!userData?.username) {
     return <Navigate to="/" />;
   }
+
 
   const handleCopy = async () => {
     try {
@@ -213,7 +222,7 @@ function MeetingRoom() {
       <div className="w-[16%] h-full bg-[rgb(35,37,50)] flex flex-col p-4 text-white">
         {/* Logo + Tagline */}
         <div>
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 tracking-wide">
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 tracking-wide" onClick={()=>navigate('/playground')}>
             Coder<span className="text-yellow-400">'$</span> Gyan
           </h1>
           <p className="text-sm text-gray-400 mt-1">Where Code Meets Wisdom</p>

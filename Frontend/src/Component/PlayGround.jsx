@@ -5,7 +5,11 @@ import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
-import { setAllUserProject, setCurrentProjectId } from "../Features/userDetailSlice";
+import {
+  setAllUserProject,
+  setCurrentMeetingId,
+  setCurrentProjectId,
+} from "../Features/userDetailSlice";
 import { BsPencilSquare } from "react-icons/bs";
 import { notify } from "../toastify.js";
 
@@ -13,14 +17,14 @@ function PlayGround() {
   const [activeTab, setActiveTab] = useState("welcome");
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [showJoinProjectModal, setShowJoinProjectModal] = useState(false);
-  const [userProjects,setUserProjects]=useState([]);
-  const [showUpdateModel,setShowUpdateModel]=useState(false);
-  const [currentProject,setCurrentProject]=useState(null);
-  const [currentTitleUpdate,setCurrentTitleUpdate]=useState("");
-  const [currentDescriptionUpdate,setCurrentDescriptionUpdate]=useState("");
-  
-  const { userData, baseURL } = useSelector((state) => state.app);
-  const dispatch=useDispatch();
+  const [userProjects, setUserProjects] = useState([]);
+  const [showUpdateModel, setShowUpdateModel] = useState(false);
+  const [currentProject, setCurrentProject] = useState(null);
+  const [currentTitleUpdate, setCurrentTitleUpdate] = useState("");
+  const [currentDescriptionUpdate, setCurrentDescriptionUpdate] = useState("");
+
+  const { userData, baseURL,currentMeetingId } = useSelector((state) => state.app);
+  const dispatch = useDispatch();
 
   const navigator = useNavigate();
   const [formData, setFormData] = useState({
@@ -40,9 +44,6 @@ function PlayGround() {
   //   "Blog Website",
   //   "Task Manager",
   // ];
-
-
-
 
   const createID = (e) => {
     setFormData((prev) => ({ ...prev, meetingId: uuidv4() }));
@@ -97,27 +98,34 @@ function PlayGround() {
       return;
     }
     try {
-       const response=await axios.post(baseURL+'/project/new-project',{
-      title:formData.title,
-      description:formData.description,
-      username:formData.username,
-      meetingId:formData.meetingId
-    },{
-      withCredentials:true
-    })
-    if(response.data.success){
-      toast.success("Project Created")
-      console.log(response.data.projectId);
-      dispatch(setCurrentProjectId(response.data.projectId));
-      navigator(`/playground/${formData.meetingId}`, {
-        state: {
-          username: formData.username, // This was also wrongly written
+      const response = await axios.post(
+        baseURL + "/project/new-project",
+        {
+          title: formData.title,
+          description: formData.description,
+          username: formData.username,
+          meetingId: formData.meetingId,
         },
-      });
-      handleClose();
-    }
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.data.success) {
+        toast.success("Project Created");
+        console.log(response.data.projectId);
+        dispatch(setCurrentProjectId(response.data.projectId));
+        dispatch(setCurrentMeetingId(formData.meetingId))
+        window.location.replace(`/playground/${formData.meetingId}`, {
+          state: {
+            username: formData.username, // This was also wrongly written
+          },
+          
+        }
+    );
+        handleClose();
+      }
     } catch (error) {
-      console.log(error,"something went wront on handleSubmit")
+      console.log(error, "something went wront on handleSubmit");
     }
   };
 
@@ -138,7 +146,7 @@ function PlayGround() {
     }));
   };
 
-  const handleJoinSubmit = (e) => {
+  const handleJoinSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted:", joinData);
     // You can add logic here to create the project
@@ -146,69 +154,91 @@ function PlayGround() {
       toast.error("All fields are required");
       return;
     }
+    try {
+      const response = await axios.post(
+        baseURL + "/project/join-project",
+        {
+          meetingId: joinData.meetingId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.data.success) {
+        notify(response.data);
+        dispatch(setCurrentProjectId(response.data.projectId));
+        dispatch(setCurrentMeetingId(joinData.meetingId))
 
-    navigator(`/playground/${joinData.meetingId}`, {
-      state: {
-        username: joinData.username,
-      },
-    });
+        console.log(joinData.meetingId)
+        console.log(currentMeetingId);
+        window.location.replace(`/playground/${joinData.meetingId}`, {
+          state: {
+            username: joinData.username,
+          },
+          
+        })
+      }
+    } catch (error) {
+      console.log(error);
+      notify(error.response?.data);
+    }
 
     handleClose();
   };
 
   //API Calling
- useEffect(() => {
-  const fetchProject = async () => {
-    try {
-      const allProject = await axios.get(
-        baseURL + "/project/get-all-project",
-        {
-          withCredentials: true,
-        }
-      );
-      console.log("All project is", allProject);
-      dispatch(setAllUserProject(allProject.data.projects))
-      setUserProjects(allProject.data.projects);
-    } catch (error) {
-      console.log("Error on showAllProject: " + error);
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const allProject = await axios.get(
+          baseURL + "/project/get-all-project",
+          {
+            withCredentials: true,
+          }
+        );
+        console.log("All project is", allProject);
+        dispatch(setAllUserProject(allProject.data.projects));
+        setUserProjects(allProject.data.projects);
+      } catch (error) {
+        console.log("Error on showAllProject: " + error);
+      }
+    };
+
+    if (activeTab === "projects") {
+      fetchProject();
     }
-  };
+  }, [activeTab]);
 
-  if (activeTab === "projects") {
-    fetchProject();
-  }
-}, [activeTab]);
-
-
-  const updateModel=(project)=>{
+  const updateModel = (project) => {
     setCurrentProject(project);
     setCurrentTitleUpdate(project.title);
     setCurrentDescriptionUpdate(project.description);
     setShowUpdateModel(true);
-  }
+  };
 
-  const handleUpdateModel=async(e)=>{
+  const handleUpdateModel = async (e) => {
     e.preventDefault();
     try {
-      const response=await axios.post(baseURL+`/project/update-project/${currentProject._id}`,{
-        title:currentTitleUpdate,
-        description:currentDescriptionUpdate
-      },
-      {
-        withCredentials:true
-      }
-    )
+      const response = await axios.post(
+        baseURL + `/project/update-project/${currentProject._id}`,
+        {
+          title: currentTitleUpdate,
+          description: currentDescriptionUpdate,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
-    console.log(response)
-    if(response.data.success)
-     notify(response.data)
-    
-    setShowUpdateModel(false);
+      console.log(response);
+      if (response.data.success) notify(response.data);
+
+      setShowUpdateModel(false);
     } catch (error) {
       console.log(error);
       console.log("error on handleUpdateModel");
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -216,7 +246,7 @@ function PlayGround() {
       <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
         <div className="flex items-center space-x-3">
           <img src="/logo.png" alt="logo" className="w-10 h-10" />
-          <h1 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 tracking-wide">
+          <h1 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 tracking-wide"  >
             Coder<span className="text-yellow-400">'$</span> Gyan
           </h1>
         </div>
@@ -286,13 +316,16 @@ function PlayGround() {
                     key={index}
                     className="bg-gray-800 w-[30%] min-w-[200px] p-4 rounded-xl hover:bg-gray-700 transition"
                   >
-                    <div className="flex justify-between" >
-                          <h3 className="text-lg font-bold text-blue-400">
-                      {project.title}
-                    </h3>
-                    <BsPencilSquare className="!text-[rgb(81,162,255)] hover:scale-110  cursor-pointer" onClick={()=>updateModel(project)} />
+                    <div className="flex justify-between">
+                      <h3 className="text-lg font-bold text-blue-400">
+                        {project.title}
+                      </h3>
+                      <BsPencilSquare
+                        className="!text-[rgb(81,162,255)] hover:scale-110  cursor-pointer"
+                        onClick={() => updateModel(project)}
+                      />
                     </div>
-                    
+
                     <p className="text-sm text-gray-400 mt-2 line-clamp-3">
                       {project.description}
                     </p>
@@ -431,15 +464,13 @@ function PlayGround() {
       {showUpdateModel && (
         <div className="fixed inset-0 backdrop-blur-sm  bg-opacity-90 flex items-center justify-center z-50">
           <div className="bg-gray-900 rounded-xl p-6 w-[90%] max-w-md space-y-4 border border-gray-700 shadow-xl">
-            
             <form onSubmit={handleUpdateModel} className="space-y-4">
               <input
                 type="text"
                 name="title"
                 placeholder="enter title"
                 value={currentTitleUpdate}
-                onChange={(e)=>setCurrentTitleUpdate(e.target.value)}
-                
+                onChange={(e) => setCurrentTitleUpdate(e.target.value)}
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
                 required
               />
@@ -448,11 +479,11 @@ function PlayGround() {
                 name="description"
                 placeholder="enter description"
                 value={currentDescriptionUpdate}
-                onChange={(e)=>setCurrentDescriptionUpdate(e.target.value)}
-                
+                onChange={(e) => setCurrentDescriptionUpdate(e.target.value)}
                 className="w-full px-4 py-2 bg-gray-800 rounded-md text-white border border-gray-600 focus:outline-none"
                 required
-              /><textarea/>
+              />
+              <textarea />
 
               <div className="flex justify-end space-x-3">
                 <button
@@ -473,8 +504,6 @@ function PlayGround() {
           </div>
         </div>
       )}
-
-
     </div>
   );
 }

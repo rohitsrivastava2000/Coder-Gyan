@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import './App.css'
-import { BrowserRouter, Routes,Route } from 'react-router-dom'
+import {  Routes,Route ,useLocation  } from 'react-router-dom'
 import LandingPage from './Component/Landing'
 // import RoomPage from './Component/RoomPage'
 import { Toaster } from 'react-hot-toast'
@@ -18,8 +18,9 @@ import PrivateRoute from "./PrivateRoute";
 import ProtectedOtpRoute from "./ProtectedOtpRoute";
 
 
-function App() {
 
+function App() {
+  const location = useLocation();
 
   return (
     <>
@@ -36,12 +37,12 @@ function App() {
               }}
         ></Toaster>
       </div>
-      <BrowserRouter>
+      
        <Routes>
        <Route path='/' element={<LandingPage/>} />
        <Route path='/playground' element={<PlayGround/>} />
        {/* <Route path='/room-page' element={<RoomPage/>} /> */}
-       <Route path='/playground/:meetingID' element={<MeetingRoom/>} />
+       <Route path='/playground/:meetingID' element={<MeetingRoom key={location.key} />} />
 
        <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
@@ -55,7 +56,7 @@ function App() {
       
        </Routes>
        <ToastContainer />
-      </BrowserRouter>
+      
     </>
   )
 }

@@ -93,42 +93,52 @@ export const joinProject = async (req, res) => {
   try {
     const { meetingId } = req.body;
     const userId = req.userId;
+
     if (!meetingId) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
-        message: "Meeting Id is Missing",
+        message: "Meeting ID is missing",
       });
     }
 
     const gotProject = await Project.findOne({ meetingId });
 
     if (!gotProject) {
-      return res.status(401).json({
+      return res.status(404).json({
         success: false,
-        message: "No any current Meeting on that Meeting ID",
+        message: "No meeting found with this ID",
       });
     }
 
-    const response = await User.findByIdAndUpdate(userId, {
-      $push: { projectId: gotProject._id },
-    })
-      .populate("projectId")
-      .exec();
-    console.log("join-Project");
-    console.log(response);
+    const user = await User.findById(userId);
+
+    // Check if the user already joined this project
+    if (user.projectId.includes(gotProject._id)) {
+      return res.status(200).json({
+        success: true,
+        message: "Joined again",
+        projectId: gotProject._id,
+      });
+    }
+
+    // Add project to user's project list
+    user.projectId.push(gotProject._id);
+    await user.save();
 
     return res.status(200).json({
       success: true,
-      message: "Join Successfully",
+      message: "Joined successfully",
       projectId: gotProject._id,
     });
   } catch (error) {
+    console.error("Error in joinProject:", error);
     return res.status(500).json({
       success: false,
-      message: "Something went wrong on joinProject",
+      message: "Something went wrong in joinProject",
     });
   }
 };
+
 
 //delete project
 export const deleteProject = async (req, res) => {
