@@ -12,6 +12,9 @@ import {
 } from "../Features/userDetailSlice";
 import { BsPencilSquare } from "react-icons/bs";
 import { notify } from "../toastify.js";
+import { format } from "date-fns";
+import { FiFolder } from "react-icons/fi";
+import { Trash2 } from "lucide-react";
 
 function PlayGround() {
   const [activeTab, setActiveTab] = useState("welcome");
@@ -23,7 +26,9 @@ function PlayGround() {
   const [currentTitleUpdate, setCurrentTitleUpdate] = useState("");
   const [currentDescriptionUpdate, setCurrentDescriptionUpdate] = useState("");
 
-  const { userData, baseURL,currentMeetingId } = useSelector((state) => state.app);
+  const { userData, baseURL, currentMeetingId } = useSelector(
+    (state) => state.app
+  );
   const dispatch = useDispatch();
 
   const navigator = useNavigate();
@@ -37,8 +42,6 @@ function PlayGround() {
     username: userData.username,
     meetingId: "",
   });
-
-
 
   const createID = (e) => {
     setFormData((prev) => ({ ...prev, meetingId: uuidv4() }));
@@ -109,14 +112,12 @@ function PlayGround() {
         toast.success("Project Created");
         console.log(response.data.projectId);
         dispatch(setCurrentProjectId(response.data.projectId));
-        dispatch(setCurrentMeetingId(formData.meetingId))
+        dispatch(setCurrentMeetingId(formData.meetingId));
         navigator(`/playground/${formData.meetingId}`, {
           state: {
             username: formData.username, // This was also wrongly written
           },
-          
-        }
-    );
+        });
         handleClose();
       }
     } catch (error) {
@@ -162,16 +163,15 @@ function PlayGround() {
       if (response.data.success) {
         notify(response.data);
         dispatch(setCurrentProjectId(response.data.projectId));
-        dispatch(setCurrentMeetingId(joinData.meetingId))
+        dispatch(setCurrentMeetingId(joinData.meetingId));
 
-        console.log(joinData.meetingId)
+        console.log(joinData.meetingId);
         console.log(currentMeetingId);
         navigator(`/playground/${joinData.meetingId}`, {
           state: {
             username: joinData.username,
           },
-          
-        })
+        });
       }
     } catch (error) {
       console.log(error);
@@ -211,19 +211,18 @@ function PlayGround() {
     setShowUpdateModel(true);
   };
 
-  const handleParticularProject=(project)=>{
+  const handleParticularProject = (project) => {
     setCurrentProject(project);
-    setCurrentProjectId(project._id);
+    dispatch(setCurrentProjectId(project._id));
+
+    console.log(project._id);
 
     navigator(`/playground/${project.meetingId}`, {
-          state: {
-            username: project.username,
-          },
-          
-        },
-      )
-
-  }
+      state: {
+        username: project.username,
+      },
+    });
+  };
 
   const handleUpdateModel = async (e) => {
     e.preventDefault();
@@ -249,13 +248,32 @@ function PlayGround() {
     }
   };
 
+  const handleClear = async (project) => {
+    try {
+      const response = await axios.post(
+        baseURL + `/project/delete-project/${project._id}`, {} ,      
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log(response);
+      if (response.data.success) notify(response.data);
+
+     
+    } catch (error) {
+      console.log(error);
+      console.log("error on handleClear");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Navbar */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
         <div className="flex items-center space-x-3">
           <img src="/logo.png" alt="logo" className="w-10 h-10" />
-          <h1 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 tracking-wide"  >
+          <h1 className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 tracking-wide cursor-pointer " onClick={()=>navigator('/')} >
             Coder<span className="text-yellow-400">'$</span> Gyan
           </h1>
         </div>
@@ -317,30 +335,76 @@ function PlayGround() {
           )}
 
           {activeTab === "projects" && (
-            <div>
-              <h2 className="text-2xl font-semibold mb-6">My Projects</h2>
-              <div className="flex flex-wrap gap-6"  >
-                {userProjects.map((project, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-800 w-[30%] min-w-[200px] p-4 rounded-xl hover:bg-gray-700 transition" onClick={()=>handleParticularProject(project)}
-                  >
-                    <div className="flex justify-between">
-                      <h3 className="text-lg font-bold text-blue-400">
-                        {project.title}
-                      </h3>
-                      <BsPencilSquare
-                        className="!text-[rgb(81,162,255)] hover:scale-110  cursor-pointer"
-                        onClick={() => updateModel(project)}
-                      />
-                    </div>
-
-                    <p className="text-sm text-gray-400 mt-2 line-clamp-3">
-                      {project.description}
-                    </p>
-                  </div>
-                ))}
+            <div className="px-4 py-6 sm:px-6">
+              {/* Header */}
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-white">My Projects</h2>
+                <p className="mt-1 text-gray-400">Your saved code projects</p>
               </div>
+
+              {/* Projects Grid */}
+              {userProjects.length > 0 ? (
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {userProjects.map((project) => (
+                    <div
+                      key={project._id}
+                      className="relative overflow-hidden rounded-xl border border-gray-700 bg-gray-800 transition-all hover:-translate-y-1 hover:border-gray-600 hover:shadow-lg"
+                      onClick={() => handleParticularProject(project)}
+                    >
+                      {/* Card Content */}
+                      <div className="p-5">
+                        <div className="flex items-start justify-between">
+                          <h3 className="truncate text-lg font-semibold text-blue-400">
+                            {project.title}
+                          </h3>
+                          <div>
+                            <button
+                              className="rounded-md p-1 hover:bg-gray-700"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateModel(project);
+                              }}
+                              aria-label="Edit project"
+                            >
+                              <BsPencilSquare className="h-4 w-4 text-blue-400 hover:text-blue-300" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleClear(project);
+                              }}
+                              className="p-2 rounded-full  text-red-400 hover:text-red-700"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <p className="mt-3 line-clamp-3 text-sm text-gray-300">
+                          {project.description || "No description available"}
+                        </p>
+
+                        <div className="mt-4 flex items-center justify-between border-t border-gray-700 pt-3 text-xs">
+                          <span className="text-gray-400">
+                            {format(new Date(project.createdAt), "dd MMM yyyy")}
+                          </span>
+                          <span className="text-gray-400">
+                            By: {project.username || "Anonymous"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-700 py-12">
+                  <FiFolder className="h-12 w-12 text-gray-500" />
+                  <p className="mt-3 text-gray-400">No projects yet</p>
+                  <button className="mt-4 text-blue-400 hover:text-blue-300">
+                    Create your first project
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
