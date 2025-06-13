@@ -42,14 +42,7 @@ function MeetingRoom() {
     }
   }, []);
  
-
-
-
-
-  useEffect(() => {
-    if (!userData?.username) return;
-
-    const gettingProjectDetail=async()=>{
+const gettingProjectDetail=async()=>{
       try {
          const response=await axios.get(baseURL+`/project/getting-project-detail/${currentProjectId}`,{withCredentials:true})
 
@@ -62,6 +55,13 @@ function MeetingRoom() {
         console.log(error,'somthing went wrong on gettingProjectDetail')
       }
     }
+
+
+
+  useEffect(() => {
+    if (!userData?.username) return;
+
+    
 
     gettingProjectDetail();
     
@@ -125,18 +125,27 @@ function MeetingRoom() {
     return cleanup;
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
+  let isRemote = false;
+
+  const handleLanguageChange = ({ language: newLang }) => {
+    if (newLang !== language) {
+      isRemote = true;
+      setLanguage(newLang);
+    }
+  };
+
+  socketRef.current.on("language-change", handleLanguageChange);
+
+  if (!isRemote) {
     socketRef.current.emit("language-change", { language, meetingID });
-    const handleLanguageChange = ({ language }) => {
-      setLanguage(language);
-    };
+  }
 
-    socketRef.current.on("language-change", handleLanguageChange);
+  return () => {
+    socketRef.current.off("language-change", handleLanguageChange);
+  };
+}, [language]);
 
-    return () => {
-      socketRef.current.off("language-change", handleLanguageChange);
-    };
-  }, [language]);
 
    useEffect(() => {
     socketRef.current.emit("enable-whiteboard", { showWhiteBoard, meetingID });
