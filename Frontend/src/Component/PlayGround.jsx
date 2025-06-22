@@ -9,6 +9,7 @@ import {
   setAllUserProject,
   setCurrentMeetingId,
   setCurrentProjectId,
+  setIsJoinProject,
 } from "../Features/userDetailSlice";
 import { BsPencilSquare } from "react-icons/bs";
 import { notify } from "../toastify.js";
@@ -213,7 +214,10 @@ function PlayGround() {
 
   const handleParticularProject = (project) => {
     setCurrentProject(project);
+    console.log(project._id , "yeh hai project id");
     dispatch(setCurrentProjectId(project._id));
+    dispatch(setCurrentMeetingId(project.meetingId));
+    dispatch(setIsJoinProject(false));
 
     console.log(project._id);
 

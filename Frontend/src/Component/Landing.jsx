@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { authentication, createUser, resetUserState } from '../Features/userDetailSlice';
 import axios from 'axios';
 import { notify } from '../toastify';
+import Slider from "./ImageSliding";
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -19,6 +20,29 @@ function LandingPage() {
     dispatch(authentication());
     dispatch(createUser());
   }, []);
+
+  const authImages = [
+  "/landingPageImage/Auth1.png",
+  "landingPageImage/Auth2.png",
+  "landingPageImage/Auth3.png",
+  ];
+
+  const dashImages = [
+  "/landingPageImage/dash1.png",
+  "landingPageImage/dash2.png",
+  "landingPageImage/dash3.png",
+  ];
+
+  const projImages = [
+  "/landingPageImage/proj1.png",
+  "landingPageImage/proj2.png",
+  
+  ];
+  const whiteImages = [
+  "/landingPageImage/white1.png",
+  "landingPageImage/white2.png",
+  
+  ];
 
   const handleLogout=async ()=>{
     console.log("aaya to hu")
@@ -151,11 +175,7 @@ function LandingPage() {
 
         {/* Right Side - Image */}
         <div className="w-full md:w-2/3 flex justify-center">
-          <img
-            src="/dashboard.png"
-            alt="dashboard preview"
-            className="w-[800px] rounded-lg   "
-          />
+          <Slider Images={authImages} width={800}/>
         </div>
         
       </div>
@@ -163,11 +183,7 @@ function LandingPage() {
       <div className="flex flex-col  md:flex-row items-center justify-between px-10 py-16 gap-10">
         {/* Left Side - Text */}
         <div className="w-full md:w-2/3 flex justify-center">
-          <img
-            src="/dashboard.png"
-            alt="dashboard preview"
-            className="w-[800px] rounded-lg  "
-          />
+          <Slider Images={dashImages} width={800}/>
         </div>
 
         {/* Right Side - Image */}
@@ -196,11 +212,7 @@ function LandingPage() {
 
         {/* Right Side - Image */}
         <div className="w-full md:w-2/3 flex justify-center">
-          <img
-            src="/dashboard.png"
-            alt="dashboard preview"
-            className="w-[800px] rounded-lg  "
-          />
+           <Slider Images={projImages} width={800}/>
         </div>
       </div>
 
@@ -255,11 +267,7 @@ function LandingPage() {
 
         {/* Right Side - Image */}
         <div className="w-full md:w-2/3 flex justify-center">
-          <img
-            src="/dashboard.png"
-            alt="dashboard preview"
-            className="w-[800px] rounded-lg  "
-          />
+           <Slider Images={whiteImages} width={800}/>
         </div>
       </div>
       <footer className="bg-black w-full  py-4">

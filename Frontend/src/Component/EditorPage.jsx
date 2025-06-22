@@ -10,7 +10,7 @@ function EditorPage({ socketRef, meetingID ,onCodeChange,language }) {
   const isRemoteUpdate = useRef(false);
   
  // const userCursorsRef = useRef({}); 
-  console.log(language +" language yeh aaraha hai hai ")
+  
   const editorOptions = {
     fontSize: 18,
     wordWrap: 'on',
@@ -73,7 +73,7 @@ function EditorPage({ socketRef, meetingID ,onCodeChange,language }) {
 
   useEffect(() => {
 
-    console.log("I am come in")
+    
     if (!socketRef.current) return;
 
     // Receive code changes from other users

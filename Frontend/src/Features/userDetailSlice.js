@@ -49,6 +49,7 @@ export const userDetail=createSlice({
         currentMeetingId:"",
         loading:false,
         isLogin:false,
+        isJoinProject:true,
         error:null,
         baseURL:'http://localhost:8000/api',
         isOtpSend:false
@@ -65,6 +66,7 @@ export const userDetail=createSlice({
         state.loading = false;
         state.projectData=null;
         state.currentProjectId="";
+        state.isJoinProject=true;
         },
         setAllUserProject:(state,action)=>{
           state.projectData=action.payload
@@ -74,6 +76,9 @@ export const userDetail=createSlice({
         },
         setCurrentMeetingId:(state,action)=>{
           state.currentMeetingId=action.payload;
+        },
+        setIsJoinProject:(state,action)=>{
+          state.isJoinProject=action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -106,5 +111,5 @@ export const userDetail=createSlice({
       });
   },
 })
-export const { setOtpSend,resetUserState,setAllUserProject,setCurrentProjectId, setCurrentMeetingId } = userDetail.actions;
+export const { setOtpSend,resetUserState,setAllUserProject,setCurrentProjectId, setCurrentMeetingId,setIsJoinProject } = userDetail.actions;
 export default userDetail.reducer;

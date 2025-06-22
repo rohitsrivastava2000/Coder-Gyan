@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCurrentMeetingId } from "../Features/userDetailSlice";
 
 function MeetingRoom() {
-  const {currentProjectId,baseURL,userData,currentMeetingId}=useSelector((state)=>state.app);
+  const {currentProjectId,baseURL,userData,currentMeetingId,isJoinProject}=useSelector((state)=>state.app);
   const  meetingID  = currentMeetingId;
   const [clients, setClients] = useState([]);
   const [language, setLanguage] = useState("javascript");
@@ -62,8 +62,10 @@ const gettingProjectDetail=async()=>{
     if (!userData?.username) return;
 
     
+    if(isJoinProject===false){
 
-    gettingProjectDetail();
+      gettingProjectDetail();
+    }
     
     const init = () => {
       socketRef.current = socket;
