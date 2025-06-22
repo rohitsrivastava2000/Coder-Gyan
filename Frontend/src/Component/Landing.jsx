@@ -38,6 +38,12 @@ function LandingPage() {
   "landingPageImage/proj2.png",
   
   ];
+  const playGroundImges = [
+  "/landingPageImage/playG1.png",
+  "landingPageImage/playG2.png",
+   "landingPageImage/playG3.png",
+  
+  ];
   const whiteImages = [
   "/landingPageImage/white1.png",
   "landingPageImage/white2.png",
@@ -219,11 +225,7 @@ function LandingPage() {
       <div className="flex flex-col  md:flex-row items-center justify-between px-10 py-16 gap-10">
         {/* Left Side - Text */}
         <div className="w-full md:w-2/3 flex justify-center">
-          <img
-            src="/dashboard.png"
-            alt="dashboard preview"
-            className="w-[800px] rounded-lg  "
-          />
+           <Slider Images={playGroundImges} width={800}/>
         </div>
 
         {/* Right Side - Image */}
