@@ -222,7 +222,7 @@ const gettingProjectDetail=async()=>{
 
 
     } catch (error) {
-      toast.error("Something went wrong, Try another language");
+      toast.error("Something went wrong, Try another language ");
       console.log(error);
     }
     
