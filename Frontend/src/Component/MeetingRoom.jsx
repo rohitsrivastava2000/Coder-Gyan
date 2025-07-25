@@ -18,7 +18,7 @@ function MeetingRoom() {
   const {currentProjectId,baseURL,userData,currentMeetingId,isJoinProject}=useSelector((state)=>state.app);
   const  meetingID  = currentMeetingId;
   const [clients, setClients] = useState([]);
-  const [language, setLanguage] = useState("javascript");
+  const [language, setLanguage] = useState("cpp");
   const navigate = useNavigate();
   const socketRef = useRef(null);
   const codeRef = useRef(null);

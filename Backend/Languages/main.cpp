@@ -1,4 +1,8 @@
-const fs = require("fs");
+// Welcome To Coder'$ Gyan
+#include <iostream>
+using namespace std;
 
-const input = fs.readFileSync("input.txt", "utf-8").trim();
-console.log(`Hello, ${input}!`);
+int main(){
+    cout<<"hello ji"<<endl;
+    return 0
+}

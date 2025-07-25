@@ -20,6 +20,9 @@ const WhiteBoard = ({socketRef,meetingID}) => {
   const [history, setHistory] = useState([]);
   const [redoHistory, setRedoHistory] = useState([]);
   const [isEraser, setIsEraser] = useState(false);
+
+  const historyRef=useRef([]);
+  const redoHistoryRef=useRef([]);
   
 
   useEffect(() => {
@@ -99,8 +102,21 @@ const WhiteBoard = ({socketRef,meetingID}) => {
     if (!image) {
       // Clear canvas if no image (initial undo)
       ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      historyRef.current = [];
+    setHistory(historyRef.current);
+    redoHistoryRef.current = [];
+    setRedoHistory([]);
       return;
     }
+      // Do NOT pop again — just set the history state properly
+  const updatedHistory = [...historyRef.current];
+  updatedHistory.pop(); // ✅ Safe to pop once
+  historyRef.current = updatedHistory;
+  setHistory(updatedHistory);
+
+  // Push image into redo history
+  redoHistoryRef.current.push(image);
+  setRedoHistory([...redoHistoryRef.current]);
 
     const img = new Image();
     img.src = image;
@@ -111,6 +127,14 @@ const WhiteBoard = ({socketRef,meetingID}) => {
   });
 
   socket.on('redo',({image})=>{
+    const currentRedo = redoHistoryRef.current;
+  if (currentRedo.length === 0) return;
+
+  const redoItem = currentRedo.pop();
+  historyRef.current.push(redoItem);
+
+  setRedoHistory([...currentRedo]);
+  setHistory([...historyRef.current]);
     const img = new Image();
     img.src = image;
     img.onload = () => {
@@ -120,6 +144,10 @@ const WhiteBoard = ({socketRef,meetingID}) => {
   })
 
   socket.on('snapshot', ({ image }) => {
+    historyRef.current.push(image);
+    setHistory(historyRef.current);
+    redoHistoryRef.current=[];
+    setRedoHistory(redoHistoryRef.current);
   const img = new Image();
   img.src = image;
   img.onload = () => {
@@ -159,62 +187,65 @@ const WhiteBoard = ({socketRef,meetingID}) => {
 
       const canvas = canvasRef.current;
       const snapshot = canvas.toDataURL();
-      setHistory((prev) => [...prev, snapshot]);
+      historyRef.current.push(snapshot);
+      setHistory(historyRef.current);
       setRedoHistory([]);
         socketRef.current.emit("snapshot", { image: snapshot, meetingID });
     }
   };
 
-  const handleUndo = () => {
-  if (history.length <= 1) {
-    // If only one item or empty, clear canvas
+const handleUndo = () => {
+  const currentHistory = historyRef.current;
+  console.log("historyRef.current.length",historyRef.current.length);
+  if (currentHistory.length <= 1) {
     ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    setRedoHistory([...redoHistory, ...history]);
+    redoHistoryRef.current.push(...currentHistory);
+    historyRef.current = [];
     setHistory([]);
-
-    socketRef.current.emit('undo', { image: null, meetingID });
+    setRedoHistory(redoHistoryRef.current);
+    socketRef.current.emit("undo", { image: null, meetingID });
     return;
   }
 
-  const newHistory = [...history];
-  const last = newHistory.pop();
-  setRedoHistory([...redoHistory, last]);
-  setHistory(newHistory);
+  const last = currentHistory.pop(); // Remove last
+  redoHistoryRef.current.push(last);
+  const newImage = currentHistory[currentHistory.length - 1];
 
-  // Restore previous state
+  historyRef.current = [...currentHistory];
+  setHistory(historyRef.current);
+  setRedoHistory(redoHistoryRef.current);
+
   const img = new Image();
-  img.src = newHistory[newHistory.length - 1];
+  img.src = newImage;
   img.onload = () => {
     ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     ctxRef.current.drawImage(img, 0, 0);
   };
 
-  socketRef.current.emit('undo', {
-    image: newHistory[newHistory.length - 1],
-    meetingID
-  });
+  socketRef.current.emit("undo", { image: newImage, meetingID });
 };
 
-  const handleRedo = () => {
-    if (redoHistory.length === 0) return;
-    const newRedo = [...redoHistory];
-    const redoItem = newRedo.pop();
-    setRedoHistory(newRedo);
-    setHistory((h) => [...h, redoItem]);
 
-    const img = new Image();
-    img.src = redoItem;
-    img.onload = () => {
-      ctxRef.current.clearRect(
-        0,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
-      ctxRef.current.drawImage(img, 0, 0);
-    };
-    socketRef.current.emit('redo',{image:redoItem,meetingID});
+  const handleRedo = () => {
+  const currentRedo = redoHistoryRef.current;
+  if (currentRedo.length === 0) return;
+
+  const redoItem = currentRedo.pop();
+  historyRef.current.push(redoItem);
+
+  setRedoHistory([...currentRedo]);
+  setHistory([...historyRef.current]);
+
+  const img = new Image();
+  img.src = redoItem;
+  img.onload = () => {
+    ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    ctxRef.current.drawImage(img, 0, 0);
   };
+
+  socketRef.current.emit("redo", { image: redoItem, meetingID });
+};
+
 
   const handleClear = () => {
     ctxRef.current.clearRect(

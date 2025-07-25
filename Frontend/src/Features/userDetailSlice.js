@@ -51,7 +51,7 @@ export const userDetail=createSlice({
         isLogin:false,
         isJoinProject:true,
         error:null,
-        baseURL:'http://localhost:8000/api',
+        baseURL:import.meta.env.VITE_API_URL,
         isOtpSend:false
 
     },

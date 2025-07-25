@@ -159,8 +159,6 @@ export const logout = async (req, res) => {
 };
 
 
-
-
 //verify otp
 export const verifyEmail = async (req, res) => {
   try {

@@ -22,10 +22,12 @@ const port = process.env.PORT || 4000;
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: 'http://localhost:5173', // your frontend domain
-  credentials: true                //  Allow cookies to be sent
-}));
+app.use(
+  cors({
+    origin: ["https://codersgyan.onrender.com", "http://localhost:5173"],
+    credentials: true,
+  })
+);
 
 app.use('/api/v1',codeRunRouter);
 app.use('/api/auth',authRoute);
