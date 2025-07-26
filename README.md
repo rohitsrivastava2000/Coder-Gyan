@@ -85,8 +85,8 @@ Coders Gyan is a powerful *real-time collaborative code editor* that supports mu
 
 ### Clone the repository
 
-bash
-git clone https://github.com/yourusername/coders-gyan.git
+```bash
+git clone https://github.com/rohitsrivastava2000/Coder-Gyan.git
 cd coders-gyan
 
 # Install frontend dependencies
@@ -98,7 +98,7 @@ npm run dev
 cd Backend
 npm install
 npm run dev
-
+```
 
 ### Upcoming Features
 
