@@ -1,4 +1,6 @@
 #!/bin/bash
+# this is my start.sh file
+
 
 echo "Installing dependencies..."
 npm install
