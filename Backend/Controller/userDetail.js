@@ -16,7 +16,8 @@ export const getInfo=async(req,res)=>{
     const detail={
         userId:user._id,
         username:user.userName,
-        email:user.email
+        email:user.email,
+        isVerify:user.isAccountVerified
     }
 
     return res.status(200).json({

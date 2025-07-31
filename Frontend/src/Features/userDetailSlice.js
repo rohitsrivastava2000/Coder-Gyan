@@ -21,23 +21,23 @@ export const createUser = createAsyncThunk(
     }
   }
 );
-export const authentication = createAsyncThunk(
-  "userDetail/authentication",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/auth/is-auth', {
-        withCredentials: true
-      });
-      return response.data;
-    } catch (error) {
-       // force isLogin false in rejected case
-      return rejectWithValue({
-        success: false,
-        message: error.response?.data?.message || "Request failed"
-      });
-    }
-  }
-);
+// export const authentication = createAsyncThunk(
+//   "userDetail/authentication",
+//   async (_, { rejectWithValue }) => {
+//     try {
+//       const response = await axios.get('http://localhost:8000/api/auth/is-auth', {
+//         withCredentials: true
+//       });
+//       return response.data;
+//     } catch (error) {
+//        // force isLogin false in rejected case
+//       return rejectWithValue({
+//         success: false,
+//         message: error.response?.data?.message || "Request failed"
+//       });
+//     }
+//   }
+// );
 
 
 export const userDetail=createSlice({
@@ -51,7 +51,7 @@ export const userDetail=createSlice({
         isLogin:false,
         isJoinProject:true,
         error:null,
-        baseURL:import.meta.env.VITE_API_URL,
+       
         isOtpSend:false
 
     },
@@ -90,25 +90,26 @@ export const userDetail=createSlice({
       .addCase(createUser.fulfilled, (state, action) => {
         state.loading = false;
         state.userData = action.payload.detail;
+        state.isLogin=action.payload.detail.isVerify;
         
       })
       .addCase(createUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message || "Something went wrong";
       })
-      .addCase(authentication.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(authentication.fulfilled, (state, action) => {
-        state.loading = false;        
-        state.isLogin=action.payload.success;
-      })
-      .addCase(authentication.rejected, (state, action) => {
-        state.loading = false;
-        state.isLogin=false
-        state.error = action.payload.message || "Something went wrong";
-      });
+      // .addCase(authentication.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = null;
+      // })
+      // .addCase(authentication.fulfilled, (state, action) => {
+      //   state.loading = false;        
+      //   state.isLogin=action.payload.success;
+      // })
+      // .addCase(authentication.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.isLogin=false
+      //   state.error = action.payload.message || "Something went wrong";
+      // });
   },
 })
 export const { setOtpSend,resetUserState,setAllUserProject,setCurrentProjectId, setCurrentMeetingId,setIsJoinProject } = userDetail.actions;

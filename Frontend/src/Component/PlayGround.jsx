@@ -27,11 +27,11 @@ function PlayGround() {
   const [currentTitleUpdate, setCurrentTitleUpdate] = useState("");
   const [currentDescriptionUpdate, setCurrentDescriptionUpdate] = useState("");
 
-  const { userData, baseURL, currentMeetingId } = useSelector(
+  const { userData, currentMeetingId } = useSelector(
     (state) => state.app
   );
   const dispatch = useDispatch();
-
+  const baseURL=import.meta.env.VITE_API_URL
   const navigator = useNavigate();
   const [formData, setFormData] = useState({
     title: "",

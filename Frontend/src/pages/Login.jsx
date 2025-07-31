@@ -3,7 +3,9 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {notify} from '../toastify.js'
+import { createUser } from "../Features/userDetailSlice.js";
 // import { createUser } from "../Features/userDetailSlice.js";
+const baseUrl=import.meta.env.VITE_API_URL
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -11,8 +13,7 @@ function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
-  const baseUrl=useSelector((state)=>state.app.baseURL);
- // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const handleLoginForm =async (e) => {
     e.preventDefault();
     setIsSubmitting(true); // Start loading
@@ -20,9 +21,9 @@ function Login() {
     try {
       console.log("hy")
       const response=await axios.post(baseUrl+'/auth/login',{email,password},{withCredentials:true})
-      console.log(response.data);
+      console.log("yaha login mai aaya",response.data);
       if(response.data.success){
-       //dispatch(createUser());
+       dispatch(createUser());
 
         notify(response.data)
         

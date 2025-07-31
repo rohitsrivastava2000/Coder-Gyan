@@ -3,10 +3,11 @@ import { Typewriter } from "react-simple-typewriter";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { authentication, createUser, resetUserState } from '../Features/userDetailSlice';
+import {  createUser, resetUserState } from '../Features/userDetailSlice';
 import axios from 'axios';
 import { notify } from '../toastify';
 import Slider from "./ImageSliding";
+const baseUrl=import.meta.env.VITE_API_URL
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -14,10 +15,9 @@ function LandingPage() {
   const dispatch = useDispatch();
   
   const { userData, loading,isLogin ,error } = useSelector((state) => state.app);
-  const baseUrl=useSelector((state)=>state.app.baseURL);
 
   useEffect(() => {
-    dispatch(authentication());
+    //dispatch(authentication());
     dispatch(createUser());
   }, []);
 
@@ -57,7 +57,7 @@ function LandingPage() {
         withCredentials:true
       })
       if(response.data.success){
-        dispatch(authentication());
+       // dispatch(authentication());
         dispatch(resetUserState());
         notify(response.data)
         navigate('/')

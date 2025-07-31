@@ -13,9 +13,10 @@ import axios from 'axios';
 import WhiteBoard from "./WhitBoard";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentMeetingId } from "../Features/userDetailSlice";
+const baseURL=import.meta.env.VITE_API_URL
 
 function MeetingRoom() {
-  const {currentProjectId,baseURL,userData,currentMeetingId,isJoinProject}=useSelector((state)=>state.app);
+  const {currentProjectId,userData,currentMeetingId,isJoinProject}=useSelector((state)=>state.app);
   const  meetingID  = currentMeetingId;
   const [clients, setClients] = useState([]);
   const [language, setLanguage] = useState("cpp");

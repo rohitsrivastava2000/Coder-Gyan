@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { authentication, createUser } from '../Features/userDetailSlice';
+import {  createUser } from '../Features/userDetailSlice';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { notify } from '../toastify';
 import { persistor } from '../Store/store.js';
+const baseUrl=import.meta.env.VITE_API_URL
 
 function Home() {
   
@@ -12,10 +13,9 @@ function Home() {
   const dispatch = useDispatch();
   const navigate=useNavigate();
   const { userData, loading,isLogin ,error } = useSelector((state) => state.app);
-  const baseUrl=useSelector((state)=>state.app.baseURL);
 
   useEffect(() => {
-    dispatch(authentication());
+   // dispatch(authentication());
     dispatch(createUser());
   }, []);
 
@@ -32,7 +32,7 @@ const resetReduxPersist = () => {
         withCredentials:true
       })
       if(response.data.success){
-        dispatch(authentication());
+     //   dispatch(authentication());
         resetReduxPersist();
         notify(response.data)
         navigate('/')

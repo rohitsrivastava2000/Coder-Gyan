@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { notify } from "../toastify.js";
+const baseUrl=import.meta.env.VITE_API_URL
 
 function ResetEmail() {
   const [email, setEmail] = useState("");
@@ -16,7 +17,6 @@ function ResetEmail() {
   const [isPassword, setIsPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const baseUrl = useSelector((state) => state.app.baseURL);
   const navigate = useNavigate();
 
   const handleChange = (e, index) => {

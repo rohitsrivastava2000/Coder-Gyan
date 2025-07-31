@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { authentication, createUser } from '../Features/userDetailSlice';
+import {  createUser } from '../Features/userDetailSlice';
 
 function Profile() {
     const {userData,isLogin,loading,error}=useSelector((state)=>state.app);
     const dispatch=useDispatch();
     useEffect(() => {
-        dispatch(authentication());
+       // dispatch(authentication());
         dispatch(createUser());
       }, []);
 

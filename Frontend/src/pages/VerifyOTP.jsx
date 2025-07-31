@@ -4,13 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {notify} from '../toastify.js'
 import { setOtpSend } from '../Features/userDetailSlice.js';
+const baseUrl=import.meta.env.VITE_API_URL
 
 function VerifyOTP() {
   const [otp, setOtp] = useState(new Array(6).fill(""))
   const inputsRef = useRef([])
 const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const baseUrl=useSelector((state)=>state.app.baseURL);
   const dispatch=useDispatch();
   const navigate=useNavigate();
 
@@ -50,10 +50,11 @@ setIsSubmitting(true); // Start loading
       const response=await axios.post(baseUrl+'/auth/verify-account',{otp:finalOtp},{
         withCredentials:true
       })
-
-      // console.log(response.data);
+      
+      console.log(response.data);
       if(response.data.success){
         //TODO Add Toast
+        console.log("base url is ",baseUrl)
         dispatch(setOtpSend(false));
         notify(response.data)
         console.log("hi")

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { setOtpSend } from "../Features/userDetailSlice";
 import axios from "axios";
 import { notify } from "../toastify.js";
+const baseUrl=import.meta.env.VITE_API_URL;
 
 function Signup() {
   const [username, setUserName] = useState("");
@@ -16,8 +17,8 @@ function Signup() {
 
   const navigate = useNavigate();
   const dispatch=useDispatch();
-  const baseUrl = useSelector((state) => state.app.baseURL);
-
+  // const baseUrl = useSelector((state) => state.app.baseURL);
+  console.log("base url is ",baseUrl);
   const handleData = {
     userName: username,
     email: email,
@@ -70,7 +71,9 @@ function Signup() {
         setTimeout(() => navigate("/verify-otp"), 1000);
       }
     } catch (error) {
-      console.log(error.data);
+      console.log(error.response?.data);
+console.log(error.message);
+console.log(error); 
       notify(error.response?.data);
     } finally {
       setIsSubmitting(false); // Stop loading
